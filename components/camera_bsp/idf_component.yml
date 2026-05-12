@@ -1,0 +1,4 @@
+## Ties the camera BSP to the registry driver (same as main/idf_component.yml).
+dependencies:
+  espressif/esp32-camera:
+    version: ">=2.0.9"

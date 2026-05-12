@@ -1,0 +1,4 @@
+## Ensures esp32-camera is fetched before any component REQUIRES it.
+dependencies:
+  espressif/esp32-camera:
+    version: ">=2.0.9"

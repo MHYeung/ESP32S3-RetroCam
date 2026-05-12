@@ -1,0 +1,15 @@
+menu "Wi-Fi (camera web test)"
+
+    config APP_WIFI_SSID
+        string "WiFi SSID"
+        default "myssid"
+        help
+            SSID (network name) for the camera web test.
+
+    config APP_WIFI_PASSWORD
+        string "WiFi password"
+        default "mypassword"
+        help
+            WiFi password (WPA or WPA2).
+
+endmenu

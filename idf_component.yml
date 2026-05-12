@@ -1,0 +1,5 @@
+## Project-level registry deps (also declared under main/ + camera_bsp/ so the
+## component manager always sees them before CMake resolves REQUIRES).
+dependencies:
+  espressif/esp32-camera:
+    version: ">=2.0.9"
