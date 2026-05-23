@@ -23,7 +23,7 @@ jobs:
         with:
           esp_idf_version: v5.5.1
           target: esp32s3
-          command: idf.py build
+          command: idf.py set-target esp32s3 && idf.py build
 
       - name: Stage binaries for web installer
         run: |
@@ -58,6 +58,27 @@ jobs:
               f.write("\n")
           print(json.dumps(manifest, indent=2))
           PY
+
+      - name: Cache-bust installer manifest URL
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          ver="${TAG#v}"
+          sed -i "s|manifest=\"manifest.json\"|manifest=\"manifest.json?v=${ver}\"|" docs/index.html
+          grep 'manifest=' docs/index.html
+
+      - name: Verify staged firmware before Pages deploy
+        run: |
+          test -s docs/firmware/bootloader.bin
+          test -s docs/firmware/partition-table.bin
+          test -s docs/firmware/esp32s3_cam_retro.bin
+          python3 -c "
+          import json
+          m = json.load(open('docs/manifest.json'))
+          for p in m['builds'][0]['parts']:
+              assert p['path'].startswith('firmware/'), p
+          print('manifest paths OK')
+          "
 
       - name: Set manifest version from tag
         env:

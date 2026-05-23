@@ -25,7 +25,8 @@ After each release, open **`manifest.json`** on Pages and confirm every `parts[]
 | Install fails | Erase flash when prompted; retry |
 | Wrong chip | Board must be **ESP32-S3** (16 MB flash, OPI PSRAM) |
 | Page has no firmware | Tag not built yet — check Actions tab |
-| 404 on `bootloader/bootloader.bin` | Bad manifest paths — paths must be `firmware/*.bin`; push workflow fix and re-tag |
+| 404 on `bootloader/bootloader.bin` | Browser cached **old** manifest — hard-refresh the Pages site or use `manifest.json?v=…` on the install page; paths must be `firmware/*.bin` |
+| Boot loop after “correct” manifest | Install may still have **failed** (404) or flash is **corrupt** — full `erase_flash` then flash again (see below) |
 | Boot loop: `TG0WDT_SYS_RST` at `ets_loader.c` | See **Boot loop after web install** below |
 
 ### Boot loop after web install
@@ -39,9 +40,10 @@ If the serial log shows `POWERON`, then immediately `TG0WDT_SYS_RST` with `ets_l
    esptool.py --chip esp32s3 -p COMx write_flash @flasher_args.json
    ```
    Download `flasher_args.json` plus the three `.bin` files from the release assets.
-3. **Compare with a local build** — `idf.py build flash monitor` on your machine. If local flash boots but web/CI does not, re-tag after updating `sdkconfig.defaults` and wait for Actions to republish `gh-pages`.
-4. **Check the module** — Firmware targets **ESP32-S3-WROOM-1 N16R8** (16 MB quad flash + octal PSRAM). An **8 MB** module or a non-S3 board will misbehave with this partition table.
-5. **USB port** — Use the **UART / programming** port for install and serial monitor, not the OTG port used for USB MSC.
+3. **Confirm the installer can download bins** — In Chrome DevTools → Network, start Install and check that requests go to `firmware/bootloader.bin` (not `bootloader/bootloader.bin`) and return **200**. Open `https://<user>.github.io/ESP32S3-RetroCam/firmware/bootloader.bin` in a new tab; it should download (~22 KB).
+4. **Compare with a local build** — `idf.py build flash monitor` on your machine. If local flash boots but web/CI does not, re-tag after updating `sdkconfig.defaults` and wait for Actions to republish `gh-pages`.
+5. **Check the module** — Firmware targets **ESP32-S3-WROOM-1 N16R8** (16 MB quad flash + octal PSRAM). An **8 MB** module or a non-S3 board will misbehave with this partition table.
+6. **USB port** — Use the **UART / programming** port for install and serial monitor, not the OTG port used for USB MSC.
 
 ## Flash from source (idf.py)
 

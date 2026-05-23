@@ -46,7 +46,8 @@
     </ul>
   </div>
 
-  <esp-web-install-button manifest="manifest.json">
+  <!-- Bump ?v= when releasing so browsers do not cache an old manifest.json -->
+  <esp-web-install-button manifest="manifest.json?v=1.0.4">
     <button slot="activate">Install firmware</button>
   </esp-web-install-button>
 
