@@ -15,6 +15,8 @@
    - Branch: **gh-pages** / **/ (root)**
 4. Open `https://<username>.github.io/esp32s3_cam_retro/`
 
+After each release, open **`manifest.json`** on Pages and confirm every `parts[].path` starts with **`firmware/`** (not `bootloader/...`). Wrong paths cause **404** in the web installer.
+
 ## Troubleshooting
 
 | Problem | Try |
@@ -23,6 +25,7 @@
 | Install fails | Erase flash when prompted; retry |
 | Wrong chip | Board must be **ESP32-S3** (16 MB flash, OPI PSRAM) |
 | Page has no firmware | Tag not built yet — check Actions tab |
+| 404 on `bootloader/bootloader.bin` | Bad manifest paths — paths must be `firmware/*.bin`; push workflow fix and re-tag |
 | Boot loop: `TG0WDT_SYS_RST` at `ets_loader.c` | See **Boot loop after web install** below |
 
 ### Boot loop after web install

@@ -42,10 +42,9 @@ jobs:
           with open("build/flasher_args.json", encoding="utf-8") as f:
               fa = json.load(f)
           parts = []
+          # Staged under docs/firmware/*.bin — flasher_args paths are e.g. bootloader/bootloader.bin
           for offset_str, file_path in fa["flash_files"].items():
-              path = file_path.replace("\\", "/")
-              if path.startswith("build/"):
-                  path = "firmware/" + os.path.basename(path)
+              path = "firmware/" + os.path.basename(file_path.replace("\\", "/"))
               parts.append({"path": path, "offset": int(offset_str, 0)})
           parts.sort(key=lambda p: p["offset"])
           manifest = {
