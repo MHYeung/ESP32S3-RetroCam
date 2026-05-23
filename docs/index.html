@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ESP32-S3 CAM Retro — Install</title>
+  <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 42rem;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      line-height: 1.5;
+      color: #1a1a1a;
+    }
+    h1 { font-size: 1.5rem; }
+    .warn {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+    }
+    code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; }
+    esp-web-install-button { margin: 1.25rem 0; }
+    esp-web-install-button button {
+      font-size: 1rem;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    ul { padding-left: 1.25rem; }
+    a { color: #1565c0; }
+  </style>
+</head>
+<body>
+  <h1>ESP32-S3 CAM Retro</h1>
+  <p>Browser installer for tagged releases. Flash over USB using Chrome or Edge.</p>
+
+  <div class="warn">
+    <strong>Before you connect</strong>
+    <ul>
+      <li>Use the board’s <strong>USB UART / serial</strong> port (programming port), not the OTG port used for SD mass storage.</li>
+      <li>Hold <strong>BOOT</strong> if the port is not detected, then click Install.</li>
+      <li>Erasing flash is recommended on first install.</li>
+    </ul>
+  </div>
+
+  <esp-web-install-button manifest="manifest.json">
+    <button slot="activate">Install firmware</button>
+  </esp-web-install-button>
+
+  <p>
+    <a href="https://github.com/MHYeung/ESP32S3-RetroCam">Source on GitHub</a>
+    ·
+    <a href="FLASHING.md">Flash troubleshooting</a>
+  </p>
+  <p><small>Firmware binaries are published when a <code>v*</code> tag is pushed (e.g. <code>v1.0.0</code>).</small></p>
+</body>
+</html>

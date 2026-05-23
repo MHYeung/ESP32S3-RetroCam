@@ -1,0 +1,68 @@
+# Build firmware and publish GitHub Pages + Release assets on version tags only.
+name: Release firmware and Pages
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build with ESP-IDF
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.5.1
+          target: esp32s3
+          command: idf.py build
+
+      - name: Stage binaries for web installer
+        run: |
+          mkdir -p docs/firmware
+          cp build/bootloader/bootloader.bin docs/firmware/
+          cp build/partition_table/partition-table.bin docs/firmware/
+          cp build/esp32s3_cam_retro.bin docs/firmware/
+          cp build/flasher_args.json docs/firmware/
+
+      - name: Set manifest version from tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          python3 <<'PY'
+          import json, os
+          tag = os.environ.get("TAG", "v0.0.0")
+          ver = tag.lstrip("v")
+          with open("docs/manifest.json", encoding="utf-8") as f:
+              m = json.load(f)
+          m["version"] = ver
+          with open("docs/manifest.json", "w", encoding="utf-8") as f:
+              json.dump(m, f, indent=2)
+              f.write("\n")
+          print(f"manifest.json version -> {ver}")
+          PY
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            docs/firmware/bootloader.bin
+            docs/firmware/partition-table.bin
+            docs/firmware/esp32s3_cam_retro.bin
+            docs/firmware/flasher_args.json
+          generate_release_notes: true
+
+      - name: Deploy to GitHub Pages (gh-pages branch)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages

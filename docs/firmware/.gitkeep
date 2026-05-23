@@ -1,0 +1,2 @@
+# Firmware .bin files are not stored on main.
+# They are built in CI and published to the gh-pages branch when you push a version tag (v1.0.0).
