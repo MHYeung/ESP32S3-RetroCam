@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#define CAM_BSP_PIN_PWDN   38
+#define CAM_BSP_PIN_PWDN   -1
 #define CAM_BSP_PIN_RESET  -1
 #define CAM_BSP_PIN_XCLK   15
 #define CAM_BSP_PIN_SIOD    4

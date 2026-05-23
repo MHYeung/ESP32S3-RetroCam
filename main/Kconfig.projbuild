@@ -1,15 +1,158 @@
-menu "Wi-Fi (camera web test)"
+menu "Wi-Fi SoftAP"
 
-    config APP_WIFI_SSID
-        string "WiFi SSID"
-        default "myssid"
+    config APP_WIFI_AP_SSID
+        string "SoftAP SSID"
+        default "ESP32S3-CAM"
         help
-            SSID (network name) for the camera web test.
+            SSID broadcast when SoftAP is toggled on by long-pressing the shutter button.
 
-    config APP_WIFI_PASSWORD
-        string "WiFi password"
-        default "mypassword"
+    config APP_WIFI_AP_PASSWORD
+        string "SoftAP password (min 8 chars)"
+        default "12345678"
         help
-            WiFi password (WPA or WPA2).
+            WPA2 password for the SoftAP.  Must be at least 8 characters.
+
+    config APP_WIFI_AP_CHANNEL
+        int "SoftAP Wi-Fi channel"
+        default 6
+        range 1 13
+
+    config APP_WIFI_AP_MAX_CONN
+        int "Max simultaneous AP clients"
+        default 2
+        range 1 4
+
+endmenu
+
+menu "SD card (1-bit SDMMC, Prusa/diymore style)"
+
+    config APP_SDMMC_PIN_CLK
+        int "SD CLK GPIO"
+        default 39
+
+    config APP_SDMMC_PIN_CMD
+        int "SD CMD GPIO"
+        default 38
+
+    config APP_SDMMC_PIN_D0
+        int "SD D0 GPIO"
+        default 40
+
+endmenu
+
+menu "Tact button"
+
+    config APP_BUTTON_GPIO
+        int "Shutter / AP-toggle / triple-tap GPIO (active LOW)"
+        default 1
+        help
+            Short tap: capture JPEG to SD.
+            Long press (APP_LONG_PRESS_MS): toggle SoftAP + HTTP gallery.
+            Triple-tap at boot (within APP_BOOT_MSC_WINDOW_MS): USB MSC mode.
+            GPIO0 is strapping — avoid unless required.
+
+    config APP_BOOT_MSC_WINDOW_MS
+        int "Boot window for triple-tap MSC (ms)"
+        default 4500
+        range 2000 8000
+
+    config APP_LONG_PRESS_MS
+        int "Long-press duration to toggle SoftAP (ms)"
+        default 2000
+        range 500 5000
+
+    config APP_TRIPLE_TAP_WINDOW_MS
+        int "Max time for 3 taps to count as triple-tap (ms)"
+        default 1200
+        range 400 3000
+
+endmenu
+
+menu "Camera capture"
+
+    choice APP_CAMERA_FRAMESIZE
+        prompt "JPEG frame size (sensor output)"
+        default APP_CAMERA_FRAMESIZE_VGA
+        help
+            Larger sizes need more PSRAM and bandwidth. VGA is a good default;
+            UXGA may fail on some boards or with Wi-Fi active.
+
+        config APP_CAMERA_FRAMESIZE_QVGA
+            bool "QVGA 320x240"
+        config APP_CAMERA_FRAMESIZE_VGA
+            bool "VGA 640x480"
+        config APP_CAMERA_FRAMESIZE_SVGA
+            bool "SVGA 800x600"
+        config APP_CAMERA_FRAMESIZE_XGA
+            bool "XGA 1024x768"
+        config APP_CAMERA_FRAMESIZE_SXGA
+            bool "SXGA 1280x1024"
+        config APP_CAMERA_FRAMESIZE_UXGA
+            bool "UXGA 1600x1200"
+    endchoice
+
+    config APP_CAMERA_JPEG_QUALITY
+        int "JPEG quality (0=best, 63=worst)"
+        default 10
+        range 4 40
+
+    config APP_CAMERA_HMIRROR
+        bool "Horizontal mirror (fix left-right reversed text)"
+        default y
+        help
+            Flips the image left-right in the sensor before JPEG encode.
+            Enable if saved photos look like a mirror (text reads backwards).
+
+    config APP_CAMERA_VFLIP
+        bool "Vertical flip (fix upside-down image)"
+        default n
+        help
+            Flips the image top-bottom. Enable if the scene is upside down,
+            or together with H-mirror for 180 degree rotation.
+
+endmenu
+
+menu "Status LED (WS2812)"
+
+    config APP_LED_GPIO
+        int "WS2812 data GPIO"
+        default 48
+
+endmenu
+
+menu "GC9A01 SPI (SPI2)"
+
+    config APP_LCD_SPI_HOST
+        int "SPI host ID (2 = SPI2_HOST)"
+        default 2
+
+    config APP_LCD_PIN_SCLK
+        int "LCD SPI SCLK"
+        default 41
+
+    config APP_LCD_PIN_MOSI
+        int "LCD SPI MOSI"
+        default 42
+
+    config APP_LCD_PIN_CS
+        int "LCD CS"
+        default 45
+
+    config APP_LCD_PIN_DC
+        int "LCD DC"
+        default 46
+
+    config APP_LCD_PIN_RST
+        int "LCD RST (-1 if tied to EN on module)"
+        default 3
+
+    config APP_LCD_PIN_BL
+        int "Backlight GPIO (-1 to disable)"
+        default -1
+
+    config APP_LCD_PREVIEW_FPS
+        int "Target preview frames per second"
+        default 6
+        range 1 15
 
 endmenu
