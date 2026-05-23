@@ -33,6 +33,33 @@ jobs:
           cp build/esp32s3_cam_retro.bin docs/firmware/
           cp build/flasher_args.json docs/firmware/
 
+      - name: Generate manifest.json from flasher_args.json
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          python3 <<'PY'
+          import json, os
+          with open("build/flasher_args.json", encoding="utf-8") as f:
+              fa = json.load(f)
+          parts = []
+          for offset_str, file_path in fa["flash_files"].items():
+              path = file_path.replace("\\", "/")
+              if path.startswith("build/"):
+                  path = "firmware/" + os.path.basename(path)
+              parts.append({"path": path, "offset": int(offset_str, 0)})
+          parts.sort(key=lambda p: p["offset"])
+          manifest = {
+              "name": "ESP32-S3 CAM Retro",
+              "version": os.environ.get("TAG", "v0.0.0").lstrip("v"),
+              "new_install_prompt_erase": True,
+              "builds": [{"chipFamily": "ESP32-S3", "parts": parts}],
+          }
+          with open("docs/manifest.json", "w", encoding="utf-8") as f:
+              json.dump(manifest, f, indent=2)
+              f.write("\n")
+          print(json.dumps(manifest, indent=2))
+          PY
+
       - name: Set manifest version from tag
         env:
           TAG: ${{ github.ref_name }}
