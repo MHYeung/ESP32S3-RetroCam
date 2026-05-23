@@ -23,6 +23,22 @@
 | Install fails | Erase flash when prompted; retry |
 | Wrong chip | Board must be **ESP32-S3** (16 MB flash, OPI PSRAM) |
 | Page has no firmware | Tag not built yet — check Actions tab |
+| Boot loop: `TG0WDT_SYS_RST` at `ets_loader.c` | See **Boot loop after web install** below |
+
+### Boot loop after web install
+
+If the serial log shows `POWERON`, then immediately `TG0WDT_SYS_RST` with `ets_loader.c` and **no** `I (...) boot: ESP-IDF` line, the chip never finished loading the **second-stage bootloader** from flash. That is almost always a **flash image / flash settings** problem, not your application code.
+
+1. **Erase all flash** — In the web installer, accept **erase** when prompted (`new_install_prompt_erase` in the manifest). Or run `idf.py erase-flash` / `esptool.py erase_flash`.
+2. **Re-flash from the GitHub Release** (same binaries CI built):
+   ```bash
+   esptool.py --chip esp32s3 -p COMx erase_flash
+   esptool.py --chip esp32s3 -p COMx write_flash @flasher_args.json
+   ```
+   Download `flasher_args.json` plus the three `.bin` files from the release assets.
+3. **Compare with a local build** — `idf.py build flash monitor` on your machine. If local flash boots but web/CI does not, re-tag after updating `sdkconfig.defaults` and wait for Actions to republish `gh-pages`.
+4. **Check the module** — Firmware targets **ESP32-S3-WROOM-1 N16R8** (16 MB quad flash + octal PSRAM). An **8 MB** module or a non-S3 board will misbehave with this partition table.
+5. **USB port** — Use the **UART / programming** port for install and serial monitor, not the OTG port used for USB MSC.
 
 ## Flash from source (idf.py)
 
